@@ -21,7 +21,10 @@ function windowCheck(win) {
   let ws = win.get_workspace();
   ws.list_windows()
     .filter(w => w !== win)
-    .forEach(w => w.change_workspace_by_index(ws.index() + 1, true));
+    .reduce((first, w) => {
+      w.change_workspace_by_index(ws.index() + 1, first);
+      return false;
+    }, true);
 }
 
 function windowSetup(win) {
