@@ -4,7 +4,7 @@ Puts windows in a new workspace when maximized.
 
 # Screencast
 
-![](screencast.png)
+![](screencast.gif)
 
 # Installation
 
