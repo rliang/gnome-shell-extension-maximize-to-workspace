@@ -1,46 +1,44 @@
 const Meta = imports.gi.Meta;
-const Mainloop = imports.mainloop;
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
 
-function connect(object, signal, cb) {
-  if (!object['__' + Me.uuid])
-    object['__' + Me.uuid] = [];
-  object['__' + Me.uuid].push(object.connect(signal, cb));
+function refresh(win) {
+  if (win.get_maximized() === Meta.MaximizeFlags.BOTH)
+    win.get_workspace()
+        .list_windows()
+        .filter(w => w !== win)
+        .reduce((first, w) => {
+          w.change_workspace_by_index(win.get_workspace().index() + 1, first);
+          return false;
+        }, true);
 }
 
-function disconnect(object) {
-  if (object['__' + Me.uuid])
-    object['__' + Me.uuid].forEach(h => object.disconnect(h));
-  delete object['__' + Me.uuid];
-}
+let _handle_disp;
+let _handle_wins = {};
 
-function windowCheck(win) {
-  if (win.get_maximized() !== Meta.MaximizeFlags.BOTH)
-    return;
-  let ws = win.get_workspace();
-  ws.list_windows()
-    .filter(w => w !== win)
-    .reduce((first, w) => {
-      w.change_workspace_by_index(ws.index() + 1, first);
-      return false;
-    }, true);
-}
-
-function windowSetup(win) {
+function start(win) {
   if (win.window_type !== Meta.WindowType.NORMAL)
     return;
-  windowCheck(win);
-  ['notify::maximized-horizontally', 'notify::maximized-vertically', 'workspace-changed']
-    .forEach(s => connect(win, s, () => windowCheck(win)));
+  refresh(win);
+  const sigs = [
+    'notify::maximized-horizontally', 'notify::maximized-vertically',
+    'workspace-changed'
+  ];
+  _handle_wins[win.get_stable_sequence()] =
+      sigs.map(sig => win.connect(sig, refresh))
+          .concat(win.connect('unmanaged', stop));
+}
+
+function stop(win) {
+  const id = win.get_stable_sequence();
+  _handle_wins[id].forEach(handle => win.disconnect(handle));
+  delete _handle_wins[id];
 }
 
 function enable() {
-  global.get_window_actors().map(a => a.meta_window).forEach(windowSetup);
-  connect(global.display, 'window-created', (d, w) => windowSetup(w));
+  global.get_window_actors().map(a => a.meta_window).forEach(start);
+  _handle_disp = global.display.connect('window-created', (d, w) => start(w));
 }
 
 function disable() {
-  global.get_window_actors().map(a => a.meta_window).forEach(disconnect);
-  disconnect(global.display);
+  global.get_window_actors().map(a => a.meta_window).forEach(stop);
+  global.display.disconnect(_handle_disp);
 }
