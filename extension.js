@@ -29,7 +29,7 @@ function start(win) {
 
 function stop(win) {
   const id = win.get_stable_sequence();
-  _handle_wins[id].forEach(handle => win.disconnect(handle));
+  (_handle_wins[id] || []).forEach(handle => win.disconnect(handle));
   delete _handle_wins[id];
 }
 
