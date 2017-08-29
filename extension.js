@@ -1,44 +1,36 @@
 const Meta = imports.gi.Meta;
 
-function refresh(win) {
-  if (win.get_maximized() === Meta.MaximizeFlags.BOTH)
-    win.get_workspace()
-        .list_windows()
-        .filter(w => w !== win)
-        .reduce((first, w) => {
-          w.change_workspace_by_index(win.get_workspace().index() + 1, first);
-          return false;
-        }, true);
-}
-
-let _handle_disp;
-let _handle_wins = {};
-
-function start(win) {
+function check(act) {
+  const win = act.meta_window;
   if (win.window_type !== Meta.WindowType.NORMAL)
     return;
-  refresh(win);
-  const sigs = [
-    'notify::maximized-horizontally', 'notify::maximized-vertically',
-    'workspace-changed'
-  ];
-  _handle_wins[win.get_stable_sequence()] =
-      sigs.map(sig => win.connect(sig, refresh))
-          .concat(win.connect('unmanaged', stop));
+  if (win.get_maximized() !== Meta.MaximizeFlags.BOTH)
+    return;
+  win.get_workspace().list_windows()
+    .filter(w => w !== win)
+    .reduce((isFirst, w) => {
+      w.change_workspace_by_index(win.get_workspace().index() + 1, isFirst);
+      return false;
+    }, true);
 }
 
-function stop(win) {
-  const id = win.get_stable_sequence();
-  (_handle_wins[id] || []).forEach(handle => win.disconnect(handle));
-  delete _handle_wins[id];
-}
+const _handles = [];
 
 function enable() {
-  global.get_window_actors().map(a => a.meta_window).forEach(start);
-  _handle_disp = global.display.connect('window-created', (d, w) => start(w));
+  global.get_window_actors().forEach(check);
+  _handles.push(global.window_manager.connect('map', (_, act) => check(act)));
+  _handles.push(global.window_manager.connect('size-change', (_, act, change) => {
+    if (change === Meta.SizeChange.MAXIMIZE)
+      check(act);
+  }));
+  _handles.push(global.window_manager.connect('switch-workspace', () => {
+    const acts = global.get_window_actors()
+      .filter(a => a.meta_window.has_focus());
+    if (acts.length)
+      check(acts[0]);
+  }));
 }
 
 function disable() {
-  global.get_window_actors().map(a => a.meta_window).forEach(stop);
-  global.display.disconnect(_handle_disp);
+  _handles.splice(0).forEach(h => global.window_manager.disconnect(h));
 }
