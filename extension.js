@@ -12,7 +12,7 @@ const Meta = imports.gi.Meta;
  */
 function check(act) {
   const win = act.meta_window;
-  const screen = win.get_screen();
+  const workspacemanager = win.get_display().get_workspace_manager();
   if (win.window_type !== Meta.WindowType.NORMAL)
     return;
   if (win.get_maximized() !== Meta.MaximizeFlags.BOTH)
@@ -21,18 +21,18 @@ function check(act) {
     .filter(w => w !== win && !w.is_always_on_all_workspaces());
   if (w.length>= 1) {
     // put on last workspace if all else fails (OO)
-    lastworkspace = screen.get_n_workspaces()-1
+    lastworkspace = workspacemanager.get_n_workspaces()-1
     // always start with the second workspace (OO)
     if (lastworkspace<1) lastworkspace=1
     for (emptyworkspace=1 ; emptyworkspace<lastworkspace; emptyworkspace++){
-      wc = screen.get_workspace_by_index(emptyworkspace).list_windows().filter(w=>!w.is_always_on_all_workspaces()).length
+      wc = workspacemanager.get_workspace_by_index(emptyworkspace).list_windows().filter(w=>!w.is_always_on_all_workspaces()).length
       if (wc<1	) break;
     }
     // don't try to move it if we're already here (break recursion)
     if (emptyworkspace == win.get_workspace().index())
       return;
     win.change_workspace_by_index(emptyworkspace,1)
-    screen.get_workspace_by_index(emptyworkspace).activate(global.get_current_time())
+    workspacemanager.get_workspace_by_index(emptyworkspace).activate(global.get_current_time())
   }
 }
 
