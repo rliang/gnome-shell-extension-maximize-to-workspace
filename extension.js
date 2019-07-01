@@ -21,9 +21,11 @@ function check(act) {
     .filter(w => w !== win && !w.is_always_on_all_workspaces());
   if (w.length>= 1) {
     // put on last workspace if all else fails (OO)
-    lastworkspace = workspacemanager.get_n_workspaces()-1
+    let lastworkspace = workspacemanager.get_n_workspaces()-1
     // always start with the second workspace (OO)
     if (lastworkspace<1) lastworkspace=1
+    let wc;
+    let emptyworkspace;
     for (emptyworkspace=1 ; emptyworkspace<lastworkspace; emptyworkspace++){
       wc = workspacemanager.get_workspace_by_index(emptyworkspace).list_windows().filter(w=>!w.is_always_on_all_workspaces()).length
       if (wc<1	) break;
