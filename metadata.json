@@ -2,6 +2,8 @@
   "name": "Maximize To Workspace",
   "description": "Puts windows in a new workspace when maximized.",
   "uuid": "maximize-to-workspace@rliang.github.com",
+  "settings-schema": "org.gnome.shell.extensions.maximize-to-workspace",
+  "gettext-domain": "gnome-shell-extensions",
   "url": "https://github.com/rliang/gnome-shell-extension-maximize-to-workspace",
   "shell-version": [
     "3.14",
