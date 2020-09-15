@@ -4,14 +4,15 @@ const Gtk = imports.gi.Gtk;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
+var SETTINGS_CHECK_SWITCH = 'check-switch';
+var SETTINGS_EXPAND = 'expand';
 var SETTINGS_SINGLE_MONITOR = 'single-monitor';
 var SETTINGS_RESTORE = 'restore';
-var SETTINGS_RESTORE_MODE = 'restore-mode';
-var SETTINGS_EXPAND = 'expand';
-var SETTINGS_RESTORE_TO_FIRST = 'restore-to-first';
 var SETTINGS_RESTORE_HISTORY = 'restore-history';
+var SETTINGS_RESTORE_MODE = 'restore-mode';
+var SETTINGS_RESTORE_TO_FIRST = 'restore-to-first';
 
-var Settings = class DashToDock_Settings {
+var Settings = class MaximizeToWorkspace_Settings {
 
   constructor() {
     this._settings = ExtensionUtils.getSettings();
@@ -22,6 +23,12 @@ var Settings = class DashToDock_Settings {
     this.widget = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER });
     this._notebook = this._builder.get_object('settings_notebook');
     this.widget.add(this._notebook);
+
+    this.widget.connect('realize', () => {
+      let window = this.widget.get_toplevel();
+      let [default_width, default_height] = window.get_default_size();
+      window.resize(default_width, 480);
+    });
 
     this._bindSettings();
 
@@ -57,6 +64,10 @@ var Settings = class DashToDock_Settings {
       Gio.SettingsBindFlags.DEFAULT);
     this._settings.bind(SETTINGS_RESTORE,
       this._builder.get_object('restore_switch'),
+      'active',
+      Gio.SettingsBindFlags.DEFAULT);
+    this._settings.bind(SETTINGS_CHECK_SWITCH,
+      this._builder.get_object('check_workspace_switch'),
       'active',
       Gio.SettingsBindFlags.DEFAULT);
               

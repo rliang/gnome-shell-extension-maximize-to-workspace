@@ -25,5 +25,10 @@
       <summary>Expand mode</summary>
       <description>Expand to first empty or fixed workspace.</description>
     </key>
+    <key type="b" name="check-switch">
+      <default>false</default>
+      <summary>Check workspace switch</summary>
+      <description>>Check focused window when switching workspaces.</description>
+    </key>
   </schema>
 </schemalist>
