@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="gnome-shell-extensions">
+  <enum id='org.gnome.shell.extensions.maximize-to-workspace.restore-mode'>
+    <value value='0' nick='RESTORE_TO_FIRST'/>
+    <value value='1' nick='RESTORE_HISTORY'/>
+  </enum>
+  <schema path="/org/gnome/shell/extensions/maximize-to-workspace/" id="org.gnome.shell.extensions.maximize-to-workspace">
+    <key type="b" name="single-monitor">
+      <default>false</default>
+      <summary>Single monitor mode</summary>
+      <description>Restict actions to primary monitor.</description>
+    </key>
+    <key type="b" name="restore">
+      <default>false</default>
+      <summary>Restore mode</summary>
+      <description>Enable or disable custom restore mode.</description>
+    </key>
+    <key name="restore-mode" enum="org.gnome.shell.extensions.maximize-to-workspace.restore-mode">
+      <default>'RESTORE_TO_FIRST'</default>
+      <summary>Restore unmaximized window mode</summary>
+      <description>Options for custom restore mode.</description>
+    </key>
+    <key type="b" name="expand">
+      <default>false</default>
+      <summary>Expand mode</summary>
+      <description>Expand to first empty or fixed workspace.</description>
+    </key>
+    <key type="b" name="check-switch">
+      <default>false</default>
+      <summary>Check workspace switch</summary>
+      <description>>Check focused window when switching workspaces.</description>
+    </key>
+  </schema>
+</schemalist>
