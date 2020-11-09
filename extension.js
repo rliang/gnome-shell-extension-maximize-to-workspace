@@ -7,7 +7,7 @@ const { WindowManager } = Me.imports.src.windowManager;
 const { SettingsManager } = Me.imports.src.settingsManager;
 /* Constants*/
 const M = 'Main';                             // Module name
-const DEBUG = true;                           // Enable/disable debug
+const DEBUG = false;                          // Enable/disable debug
 /* Global variables*/
 let managers, windowManager;
 
