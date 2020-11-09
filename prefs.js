@@ -1,6 +1,6 @@
 'use strict';
-const Gio = imports.gi.Gio;
-const Gtk = imports.gi.Gtk;
+const { Gio, Gtk } = imports.gi;
+
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
@@ -13,7 +13,6 @@ var SETTINGS_RESTORE_MODE = 'restore-mode';
 var SETTINGS_RESTORE_TO_FIRST = 'restore-to-first';
 
 var Settings = class MaximizeToWorkspace_Settings {
-
   constructor() {
     this._settings = ExtensionUtils.getSettings();
 
@@ -25,8 +24,8 @@ var Settings = class MaximizeToWorkspace_Settings {
     this.widget.add(this._notebook);
 
     this.widget.connect('realize', () => {
-      let window = this.widget.get_toplevel();
-      let [default_width, default_height] = window.get_default_size();
+      const window = this.widget.get_toplevel();
+      const [default_width, default_height] = window.get_default_size();
       window.resize(default_width, 480);
     });
 
@@ -36,7 +35,6 @@ var Settings = class MaximizeToWorkspace_Settings {
   }
 
   _connector(builder, object, signal, handler) {
-     
     const SignalHandler = {
       restore_to_first_radio_button_toggled_cb(button) {
         if (button.get_active())
@@ -53,7 +51,6 @@ var Settings = class MaximizeToWorkspace_Settings {
   }
 
   _bindSettings() {
-    
     this._settings.bind(SETTINGS_SINGLE_MONITOR,
       this._builder.get_object('single_monitor_switch'),
       'active',
@@ -89,8 +86,7 @@ function init() {
 }
 
 function buildPrefsWidget() {
-  let settings = new Settings();
-  let widget = settings.widget;
-  widget.show_all();
-  return widget;
+  const settings = new Settings();
+  settings.widget.show_all();
+  return settings.widget;
 }
